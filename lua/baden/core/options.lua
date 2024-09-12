@@ -10,6 +10,8 @@ opt.autoindent = true
 
 opt.wrap = false
 
+opt.autowrite = true;
+
 opt.ignorecase = true
 opt.smartcase = true
 
