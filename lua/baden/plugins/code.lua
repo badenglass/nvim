@@ -135,4 +135,9 @@ return {
           require("nvim-surround").setup({})
       end,
   },
+  {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    config = true
+  },
 }
