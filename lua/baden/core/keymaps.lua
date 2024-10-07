@@ -7,7 +7,7 @@ map("n", "<leader><esc>", "<cmd>nohl<CR>", { desc = "Clear search highlights" })
 map("n", "<leader>L", "<cmd>Lazy<CR>", { desc = "Lazy" })
 map("n", "<leader>a", "<cmd>Alpha<CR>", { desc = "Alpha" })
 
-map("n", "<leader>va", "ggVG", { desc = "Highlight all" })
+map("n", "<leader>v", "ggVG", { desc = "Highlight all" })
 
 map("n", "<leader>n", "<cmd>bnext<CR>", { desc = "Next Buffer" })
 map("n", "<leader>p", "<cmd>bprevious<CR>", { desc = "Previous Buffer" })

@@ -8,6 +8,8 @@ opt.shiftwidth = 2
 opt.expandtab = true
 opt.autoindent = true
 
+opt.laststatus = 2
+
 opt.wrap = false
 
 opt.autowrite = true;

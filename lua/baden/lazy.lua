@@ -11,8 +11,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- once lsp is added
--- { { import = "baden.plugins" }, { import = "baden.plugins.lsp" } }
 require("lazy").setup({ import = "baden.plugins" }, {
   checker = {
     enabled = true,
