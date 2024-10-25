@@ -5,9 +5,8 @@ your machine
 
 please create an issue if you've got feedback or suggestions!
 
-## Structure .config/nvim/ ├── after │   └── ftplugin │       ├── cpp.lua │  
-└── markdown.lua ├── init.lua ├── lazy-lock.json ├── lua │   └── baden │  
-├── core │       │   ├── commands.lua │       │   ├── init.lua │       │   ├──
-keymaps.lua │       │   └── options.lua │       ├── lazy.lua │       ├──
-notes.lua │       └── plugins │           ├── code.lua │           ├──
-navigation.lua │           └── ui.lua └── README.md
+WIP:
+
+- markdown format in paragraph
+- markdown disable format on save
+- cpp enable format on save
