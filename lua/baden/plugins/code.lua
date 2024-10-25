@@ -38,7 +38,10 @@ return {
         local lua_opts = lsp_zero.nvim_lua_ls()
         require('lspconfig').lua_ls.setup(lua_opts)
 
+        require('lspconfig').marksman.setup{}
+
         lsp_zero.setup_servers({'clangd'})
+        lsp_zero.setup_servers({'marksman'})
 
         ---
         -- Autocompletion config
@@ -53,6 +56,7 @@ return {
             {name = 'buffer'},
             {name = 'path'},
             {name = 'codeium'},
+            {name = 'nvim_lsp'},
           },
           --- (Optional) Show source name in completion menu
           formatting = cmp_format,
@@ -139,5 +143,12 @@ return {
     'windwp/nvim-autopairs',
     event = "InsertEnter",
     config = true
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
   },
 }

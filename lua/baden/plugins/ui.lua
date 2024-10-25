@@ -24,11 +24,10 @@ return {
               [[                                             ]],
         }
         dashboard.section.buttons.val = {
+            dashboard.button( "l", "  Code" , ":cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>"),
             dashboard.button( "e", "  New file" , ":ene <BAR> startinsert <CR>"),
-            dashboard.button( "r", "􀈎  Recent files" , ":Telescope oldfiles<CR>"),
-            dashboard.button( "l", "􀇳  Code" , ":cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>"),
-            dashboard.button( "n", "􀦌  Open Notes" , ":terminal open $(fd . -tf '/Users/baden/Documents/cccs/notes' | fzf) <BAR> startinsert <CR>"),
-            dashboard.button( "a", "􁚛  Open Assignments" , ":terminal open $(fd . -tf '/Users/baden/Documents/cccs/assignments' | fzf) <CR>"),
+            dashboard.button( "v", "󰠮  Find a Notes" , ":FindNote<CR>"),
+            dashboard.button( "d", "  Open Daily Note" , ":NewDailyNote<CR>"),
             dashboard.button( "q", "󰅚  Quit NVIM" , ":qa<CR>"),
         }
         local handle = io.popen('fortune')
@@ -93,38 +92,12 @@ return {
     end,
   },
   {
-      "loctvl842/monokai-pro.nvim",
-      lazy = false,
-      priority = 1000,
-      config = function()
-        require("monokai-pro").setup({
-          transparent_background = false,
-          terminal_colors = true,
-          devicons = true, -- highlight the icons of `nvim-web-devicons`
-          styles = {
-            comment = { italic = true },
-            keyword = { italic = true }, -- any other keyword
-            type = { italic = true }, -- (preferred) int, long, char, etc
-            storageclass = { italic = true }, -- static, register, volatile, etc
-            structure = { italic = true }, -- struct, union, enum, etc
-            parameter = { italic = true }, -- parameter pass in function
-            annotation = { italic = true },
-            tag_attribute = { italic = true }, -- attribute of tag in reactjs
-          },
-          filter = "pro", -- classic | octagon | pro | machine | ristretto | spectrum
-          -- Enable this will disable filter option
-          day_night = {
-            enable = false, -- turn off by default
-            day_filter = "pro", -- classic | octagon | pro | machine | ristretto | spectrum
-            night_filter = "spectrum", -- classic | octagon | pro | machine | ristretto | spectrum
-          },
-          inc_search = "background", -- underline | background
-          background_clear = {
-            "telescope",
-            -- "which-key",
-          },
-        })
-      end,
+    "shaunsingh/nord.nvim",
+    lazy = false,
+    priority = 1000,
+    init = function()
+      vim.cmd.colorscheme("nord")
+    end,
   },
   {
       "slugbyte/lackluster.nvim",
