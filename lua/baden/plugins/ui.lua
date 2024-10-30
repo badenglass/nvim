@@ -25,9 +25,10 @@ return {
         }
         dashboard.section.buttons.val = {
             dashboard.button( "l", "  Code" , ":cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>"),
-            dashboard.button( "e", "  New file" , ":ene <BAR> startinsert <CR>"),
-            dashboard.button( "v", "󰠮  Find a Notes" , ":FindNote<CR>"),
-            dashboard.button( "d", "  Open Daily Note" , ":NewDailyNote<CR>"),
+            dashboard.button( "e", "  New File" , ":ene <BAR> startinsert <CR>"),
+            dashboard.button( "v", "󰠮  Find a Note" , ":FindNote<CR>"),
+            dashboard.button( "d", "  Daily Note" , ":NewDailyNote<CR>"),
+            dashboard.button( "l", "󰒲  Lazy" , ":Lazy<CR>"),
             dashboard.button( "q", "󰅚  Quit NVIM" , ":qa<CR>"),
         }
         local handle = io.popen('fortune')
@@ -45,11 +46,14 @@ return {
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
+    opts = {},
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
     init = function()
       vim.o.timeout = true
       vim.o.timeoutlen = 500
     end,
-    opts = {},
   },
   {
     "folke/noice.nvim",
@@ -73,7 +77,7 @@ return {
           command_palette = true, -- position the cmdline and popupmenu together
           long_message_to_split = true, -- long messages will be sent to a split
           inc_rename = false, -- enables an input dialog for inc-rename.nvim
-          lsp_doc_border = false, -- add a border to hover docs and signature help
+          lsp_doc_border = true, -- add a border to hover docs and signature help
         },
         cmdline = {
           format = {
@@ -99,15 +103,4 @@ return {
       vim.cmd.colorscheme("nord")
     end,
   },
-  {
-      "slugbyte/lackluster.nvim",
-      lazy = true,
-      -- priority = 1000,
-      init = function()
-          -- vim.cmd.colorscheme("lackluster")
-          -- vim.cmd.colorscheme("lackluster-hack")
-          -- vim.cmd.colorscheme("lackluster-mint")
-      end,
-  },
-
  }

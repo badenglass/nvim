@@ -3,13 +3,12 @@ return {
     'nvim-telescope/telescope.nvim', tag = '0.1.6',
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
-
-      local builtin = require('telescope.builtin')
+      local builtin = require("telescope.builtin")
       local actions = require("telescope.actions")
+      local map = vim.keymap.set
 
       require('telescope').setup{
         defaults = {
-          -- config_key = value,
           mappings = {
             i = {
               ["<C-u>"] = false,
@@ -26,35 +25,12 @@ return {
         extensions = {},
       }
 
-      local M = {}
-
-      function M.find_config()
-        require("telescope.builtin").find_files {
-          prompt_title = " Find Notes",
-          path_display = { "smart" },
-          cwd = "~/.config/",
-        }
-      end
-
-      function M.find_nvim()
-        require("telescope.builtin").find_files {
-          prompt_title = " Find Notes",
-          path_display = { "smart" },
-          cwd = "~/.config/nvim/",
-        }
-      end
-
-      vim.keymap.set('n', '<leader>e', builtin.find_files, { desc = "find files" })
-      vim.keymap.set('n', '<leader>b', builtin.buffers, { desc = "buffers" })
-      vim.keymap.set('n', '<leader>r', builtin.oldfiles, { desc = "recent files" })
-      vim.keymap.set('n', '<leader>g', builtin.grep_string, { desc = "grep" })
-
-      vim.keymap.set('n', '<leader>fc', M.find_config, { desc = "find configs" })
-      vim.keymap.set('n', '<leader>fC', M.find_nvim, { desc = "find neovim config" })
-
-      -- vim.keymap.set('n', '<leader>ff', builtin.planets, { desc = "find code" })
-      vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = "keymaps" })
-      vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = "help" })
+      map('n', '<leader>f/', builtin.keymaps, { desc = "keymaps" })
+      map('n', '<leader>f?', builtin.help_tags, { desc = "help" })
+      map('n', '<leader>e', builtin.find_files, { desc = "files" })
+      map('n', '<leader>b', builtin.buffers, { desc = "buffers" })
+      map('n', '<leader>r', builtin.oldfiles, { desc = "recent files" })
+      map('n', '<leader>g', builtin.grep_string, { desc = "grep" })
 
     end,
   },
@@ -80,15 +56,5 @@ return {
         },
       })
     end,
-  },
-  {
-    "ThePrimeagen/harpoon",
-    opts = {},
-    keys = {
-      { "<leader>h", "<cmd>lua require('harpoon.mark').add_file()<CR>", desc = "Harpoon Mark" },
-      { "<leader>H", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<CR>", desc = "Harpoon Menu" },
-      { "<leader>hn", "<cmd>lua require('harpoon.ui').nav_next()<CR>", desc = "Harpoon Mark" },
-      { "<leader>hp", "<cmd>lua require('harpoon.ui').nav_prev()<CR>", desc = "Harpoon Mark" },
-    },
   },
 }

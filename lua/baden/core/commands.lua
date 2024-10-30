@@ -1,5 +1,6 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
+local usercmd = vim.api.nvim_create_user_command
 
 augroup('YankHighlight', { clear = true })
 autocmd('TextYankPost', {
@@ -14,14 +15,21 @@ autocmd('BufWritePre', {
   command = ":%s/\\s\\+$//e"
 })
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.md",
+autocmd("BufWritePre", {
+  pattern = "*.cpp,*.h",
   callback = function()
-    vim.cmd("normal! ggVGgq")
+    vim.cmd("LspZeroFormat")
   end,
 })
 
-vim.api.nvim_create_user_command("NewClassNote", function()
+autocmd("BufWritePre", {
+  pattern = "*.md",
+  callback = function()
+    vim.cmd("echo 'fix me!'")
+  end,
+})
+
+usercmd("NewClassNote", function()
   local notes_dir = "~/repos/ciss245/e/notes/"
   local filename = vim.fn.input("class note filename: ")
 
@@ -39,7 +47,7 @@ vim.api.nvim_create_user_command("NewClassNote", function()
   vim.cmd("edit " .. filepath)
 end, {})
 
-vim.api.nvim_create_user_command("NewNote", function()
+usercmd("NewNote", function()
   local notes_dir = "~/Documents/notes/"
   local filename = vim.fn.input("Note filename: ")
 
@@ -59,7 +67,7 @@ vim.api.nvim_create_user_command("NewNote", function()
   vim.cmd("edit " .. filepath)
 end, {})
 
-vim.api.nvim_create_user_command("NewDailyNote", function()
+usercmd("DailyNote", function()
   local notes_dir = "~/Documents/notes/"
   local date_str = os.date("%d-%m-%Y")
 
@@ -68,7 +76,38 @@ vim.api.nvim_create_user_command("NewDailyNote", function()
   vim.cmd("edit " .. filepath)
 end, {})
 
-vim.api.nvim_create_user_command("FindNote", function()
-  local notes = require("baden.notes")
-  notes.find_notes()
+usercmd("FindNote", function()
+  require("telescope.builtin").find_files {
+    prompt_title = " Find Notes",
+    path_display = { "smart" },
+    cwd = "~/Documents/notes/",
+    layout_strategy = "horizontal",
+    layout_config = { preview_width = 0.65, width = 0.75 }
+  }
+end, {})
+
+usercmd("FindCode", function()
+  require("telescope.builtin").find_files {
+    prompt_title = " Find Code",
+    path_display = { "smart" },
+    cwd = "~/repos/ciss245/",
+    layout_strategy = "horizontal",
+    layout_config = { preview_width = 0.65, width = 0.75 }
+  }
+end, {})
+
+usercmd("FindConfig", function()
+  require("telescope.builtin").find_files {
+    prompt_title = " Find Config",
+    path_display = { "smart" },
+    cwd = "~/.config/",
+  }
+end, {})
+
+usercmd("FindNeovimConfig", function()
+  require("telescope.builtin").find_files {
+    prompt_title = " Find Neovim Config",
+    path_display = { "smart" },
+    cwd = "~/.config/nvim/",
+  }
 end, {})

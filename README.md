@@ -7,6 +7,4 @@ please create an issue if you've got feedback or suggestions!
 
 WIP:
 
-- markdown format in paragraph
-- markdown disable format on save
-- cpp enable format on save
+ - snippets
