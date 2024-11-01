@@ -13,12 +13,16 @@ map("v", ">", ">gv")
 map("n", "<C-d>", "<C-d>zz")
 map("n", "<C-u>", "<C-u>zz")
 
+map("n", "<leader>`", "<cmd>Alpha<CR>", { desc = "dashboard" })
+
 map("n", "<leader>n", "<cmd>bnext<CR>", { desc = "next buffer" })
 map("n", "<leader>p", "<cmd>bprevious<CR>", { desc = "previous buffer" })
 map("n", "<leader>q", "<cmd>bdelete<CR>", { desc = "delete buffer" })
 
-map("n", "<leader>`", "<cmd>Alpha<CR>", { desc = "dashboard" })
+map('n', '<leader>d', "<cmd>Tcd<CR>", { desc = "change directory" })
 map('n', '<leader>fj', "<cmd>FindCode<CR>", { desc = "code" })
 map('n', '<leader>fk', "<cmd>FindNote<CR>", { desc = "note" })
 map('n', '<leader>fl', "<cmd>FindConfig<CR>", { desc = "config" })
 map('n', '<leader>fL', "<cmd>FindNeovimConfig<CR>", { desc = "neovim config" })
+
+map('n', '<leader>l', "<cmd>Run<CR>", { desc = "compile & run (floating)" })

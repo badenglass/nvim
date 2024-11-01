@@ -27,7 +27,7 @@ return {
             dashboard.button( "l", "  Code" , ":cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>"),
             dashboard.button( "e", "  New File" , ":ene <BAR> startinsert <CR>"),
             dashboard.button( "v", "󰠮  Find a Note" , ":FindNote<CR>"),
-            dashboard.button( "d", "  Daily Note" , ":NewDailyNote<CR>"),
+            dashboard.button( "t", "  Daily Note" , ":DailyNote<CR>"),
             dashboard.button( "l", "󰒲  Lazy" , ":Lazy<CR>"),
             dashboard.button( "q", "󰅚  Quit NVIM" , ":qa<CR>"),
         }

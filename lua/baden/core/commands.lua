@@ -111,3 +111,34 @@ usercmd("FindNeovimConfig", function()
     cwd = "~/.config/nvim/",
   }
 end, {})
+
+usercmd("Tcd", function()
+  local dropdown = require('telescope.themes').get_dropdown({
+    borderchars = {
+      { '─', '│', '─', '│', '┌', '┐', '┘', '└'},
+      prompt = {"─", "│", " ", "│", '┌', '┐', "│", "│"},
+      results = {"─", "│", "─", "│", "├", "┤", "┘", "└"},
+      preview = { '─', '│', '─', '│', '┌', '┐', '┘', '└'},
+    },
+    width = 0.8,
+    previewer = false,
+    prompt_title = false
+  })
+  require("telescope.builtin").find_files(vim.tbl_extend("force", dropdown, {
+    path_display = { "smart" },
+    find_command = { "fd", "--type", "d" },
+    attach_mappings = function(prompt_bufnr, map)
+      local actions = require("telescope.actions")
+      local action_state = require("telescope.actions.state")
+
+      map("i", "<CR>", function()
+        local selection = action_state.get_selected_entry()
+        local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+        actions.close(prompt_bufnr)
+        vim.cmd(string.format("cd %s", dir))
+      end)
+
+      return true
+    end,
+  }))
+end, {})
