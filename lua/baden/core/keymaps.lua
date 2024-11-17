@@ -14,6 +14,8 @@ map("n", "<C-d>", "<C-d>zz")
 map("n", "<C-u>", "<C-u>zz")
 
 map("n", "<leader>`", "<cmd>Alpha<CR>", { desc = "dashboard" })
+map("n", "<leader>,", "<cmd>LspZeroFormat<CR>", { desc = "format" })
+map("n", "<leader><cr>", "<cmd>Run<CR>", { desc = "run"})
 
 map("n", "<leader>n", "<cmd>bnext<CR>", { desc = "next buffer" })
 map("n", "<leader>p", "<cmd>bprevious<CR>", { desc = "previous buffer" })

@@ -1,10 +1,10 @@
 return {
   {
-    "nvim-lua/plenary.nvim",
+    'nvim-lua/plenary.nvim',
   },
   {
-    "goolord/alpha-nvim",
-    dependencies = {"echasnovski/mini.icons"},
+    'goolord/alpha-nvim',
+    dependencies = {'echasnovski/mini.icons'},
     config = function ()
         local alpha = require'alpha'
         local dashboard = require'alpha.themes.dashboard'
@@ -24,31 +24,29 @@ return {
               [[                                             ]],
         }
         dashboard.section.buttons.val = {
-            dashboard.button( "l", "  Code" , ":cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>"),
-            dashboard.button( "e", "  New File" , ":ene <BAR> startinsert <CR>"),
-            dashboard.button( "v", "󰠮  Find a Note" , ":FindNote<CR>"),
-            dashboard.button( "t", "  Daily Note" , ":DailyNote<CR>"),
-            dashboard.button( "l", "󰒲  Lazy" , ":Lazy<CR>"),
-            dashboard.button( "q", "󰅚  Quit NVIM" , ":qa<CR>"),
+            dashboard.button( 'l', '  Code' , ':cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>'),
+            dashboard.button( 'e', '  New File' , ':ene <BAR> startinsert <CR>'),
+            dashboard.button( 'v', '󰠮  Find a Note' , ':FindNote<CR>'),
+            dashboard.button( 't', '  Daily Note' , ':DailyNote<CR>'),
+            dashboard.button( 'l', '󰒲  Lazy' , ':Lazy<CR>'),
+            dashboard.button( 'q', '󰅚  Quit NVIM' , ':qa<CR>'),
         }
         local handle = io.popen('fortune')
-        local fortune = handle:read("*a")
+        local fortune = handle:read('*a')
         handle:close()
         dashboard.section.footer.val = fortune
 
         dashboard.config.opts.noautocmd = true
 
-        vim.cmd[[autocmd User AlphaReady echo 'nice']]
-
         alpha.setup(dashboard.config)
     end
   },
   {
-    "folke/which-key.nvim",
-    event = "VeryLazy",
+    'folke/which-key.nvim',
+    event = 'VeryLazy',
     opts = {},
     dependencies = {
-      "nvim-tree/nvim-web-devicons",
+      'echasnovski/mini.icons',
     },
     init = function()
       vim.o.timeout = true
@@ -56,36 +54,35 @@ return {
     end,
   },
   {
-    "folke/noice.nvim",
-    event = "VeryLazy",
+    'folke/noice.nvim',
+    event = 'VeryLazy',
     opts = {},
     dependencies = {
-      "MunifTanjim/nui.nvim",
+      'MunifTanjim/nui.nvim',
     },
     config = function()
-      require("noice").setup({
+      require('noice').setup({
         lsp = {
           override = {
-            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-            ["vim.lsp.util.stylize_markdown"] = true,
-            ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+            ['vim.lsp.util.stylize_markdown'] = true,
+            ['cmp.entry.get_documentation'] = true,
           },
         },
-        -- you can enable a preset for easier configuration
         presets = {
-          bottom_search = true, -- use a classic bottom cmdline for search
-          command_palette = true, -- position the cmdline and popupmenu together
-          long_message_to_split = true, -- long messages will be sent to a split
-          inc_rename = false, -- enables an input dialog for inc-rename.nvim
-          lsp_doc_border = true, -- add a border to hover docs and signature help
+          bottom_search = true,
+          command_palette = true,
+          long_message_to_split = true,
+          inc_rename = false,
+          lsp_doc_border = true,
         },
         cmdline = {
           format = {
             search_down = {
-              view = "cmdline",
+              view = 'cmdline',
             },
             search_up = {
-              view = "cmdline",
+              view = 'cmdline',
             },
           },
         },
@@ -96,11 +93,27 @@ return {
     end,
   },
   {
-    "shaunsingh/nord.nvim",
+    'shaunsingh/nord.nvim',
+    lazy = true,
+    -- priority = 1000,
+    init = function()
+      vim.cmd.colorscheme('nord')
+    end,
+  },
+  {
+    'sainnhe/everforest',
     lazy = false,
     priority = 1000,
-    init = function()
-      vim.cmd.colorscheme("nord")
+    config = function()
+      vim.g.everforest_enable_italic = true
+      vim.cmd.colorscheme('everforest')
     end,
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
   },
  }

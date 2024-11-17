@@ -15,12 +15,12 @@ autocmd('BufWritePre', {
   command = ":%s/\\s\\+$//e"
 })
 
-autocmd("BufWritePre", {
-  pattern = "*.cpp,*.h",
-  callback = function()
-    vim.cmd("LspZeroFormat")
-  end,
-})
+-- autocmd("BufWritePre", {
+--   pattern = "*.cpp,*.h",
+--   callback = function()
+--     vim.cmd("LspZeroFormat")
+--   end,
+-- })
 
 autocmd("BufWritePre", {
   pattern = "*.md",
