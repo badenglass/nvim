@@ -8,6 +8,8 @@ return {
     config = function ()
         local alpha = require'alpha'
         local dashboard = require'alpha.themes.dashboard'
+        local ssh = vim.env.SSH_CONNECTION ~= nil
+        local loc = ssh and "remote" or "local"
         dashboard.section.header.val = {
               [[                                             ]],
               [[                                             ]],
@@ -22,15 +24,21 @@ return {
               [[                                             ]],
               [[                                             ]],
               [[                                             ]],
+              [[    ]] .. loc,
         }
-        dashboard.section.buttons.val = {
-            dashboard.button( 'l', '  Code' , ':cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>'),
+        local buttons = {
             dashboard.button( 'e', '  New File' , ':ene <BAR> startinsert <CR>'),
-            dashboard.button( 'v', '󰠮  Find a Note' , ':FindNote<CR>'),
-            dashboard.button( 't', '  Daily Note' , ':DailyNote<CR>'),
             dashboard.button( 'l', '󰒲  Lazy' , ':Lazy<CR>'),
             dashboard.button( 'q', '󰅚  Quit NVIM' , ':qa<CR>'),
         }
+        if ssh then
+            table.insert(buttons, 1, dashboard.button( 'k', '  Code' , ':cd ~/repos/ciss245 <BAR> edit ~/repos/ciss245/main.cpp <BAR> startinsert <CR>'))
+            table.insert(buttons, 3, dashboard.button( 'v', '󰠮  Find a Note' , ':FindNote<CR>'))
+            table.insert(buttons, 4, dashboard.button( 't', '  Daily Note' , ':DailyNote<CR>'))
+        end
+
+        dashboard.section.buttons.val = buttons
+
         local handle = io.popen('fortune')
         local fortune = handle:read('*a')
         handle:close()

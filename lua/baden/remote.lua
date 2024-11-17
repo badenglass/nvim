@@ -1,4 +1,10 @@
 local usercmd = vim.api.nvim_create_user_command
+local map = vim.keymap.set
+
+map('n', '<leader>fj', "<cmd>FindCode<CR>", { desc = "code" })
+map('n', '<leader>fk', "<cmd>FindNote<CR>", { desc = "note" })
+map('n', '<leader>fl', "<cmd>FindConfig<CR>", { desc = "config" })
+map('n', '<leader>fL', "<cmd>FindNeovimConfig<CR>", { desc = "neovim config" })
 
 usercmd("NewClassNote", function()
   local notes_dir = "~/repos/ciss245/e/notes/"
@@ -64,22 +70,6 @@ usercmd("FindCode", function()
     cwd = "~/repos/ciss245/",
     layout_strategy = "horizontal",
     layout_config = { preview_width = 0.65, width = 0.75 }
-  }
-end, {})
-
-usercmd("FindConfig", function()
-  require("telescope.builtin").find_files {
-    prompt_title = " Find Config",
-    path_display = { "smart" },
-    cwd = "~/.config/",
-  }
-end, {})
-
-usercmd("FindNeovimConfig", function()
-  require("telescope.builtin").find_files {
-    prompt_title = " Find Neovim Config",
-    path_display = { "smart" },
-    cwd = "~/.config/nvim/",
   }
 end, {})
 
