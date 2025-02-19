@@ -1,0 +1,3 @@
+# Baden's Neovim Configuration
+
+Well it's certainely something...
