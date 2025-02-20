@@ -16,6 +16,7 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
+
 local opt = vim.opt
 
 opt.relativenumber = true
@@ -165,12 +166,51 @@ autocmd('BufWritePre', {
   end,
 })
 
+-- markdown options
+autocmd("FileType", {
+  group = augroup("MarkdownSettings"),
+  pattern = { "markdown", "md" },
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+
+    vim.opt_local.signcolumn = "yes:2"
+    vim.opt_local.foldcolumn = "1"
+    vim.opt_local.colorcolumn = "0"
+
+    vim.opt_local.list = true
+    vim.opt_local.listchars = {
+      leadmultispace = "   ",
+      lead = " ",
+    }
+
+    vim.opt_local.textwidth = 80
+    vim.opt_local.wrapmargin = 2
+    vim.opt_local.formatoptions = vim.opt_local.formatoptions
+        + 'o' -- continue comments
+        + 'q' -- allow formatting of comments with gq
+        + 'j' -- remove comment leader when joining
+
+    vim.opt_local.foldmethod = 'expr'
+    vim.opt_local.foldexpr = 'nvim_treesitter#foldexpr()'
+    vim.opt_local.foldenable = false
+  end,
+})
+
+
 --                                                                          _
 --         _   _ ___  ___ _ __ ___ ___  _ __ ___  _ __ ___   __ _ _ __   __| |___
 --        | | | / __|/ _ \ '__/ __/ _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|
 --        | |_| \__ \  __/ | | (_| (_) | | | | | | | | | | | (_| | | | | (_| \__ \
 --         \__,_|___/\___|_|  \___\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
 --                                                                    usercommands
+--        TODO: daily note & hugo integration
 
 --                                       _
 --                                      | | _____ _   _ _ __ ___   __ _ _ __  ___
@@ -229,39 +269,104 @@ opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
   spec = {
+    --                                                                              _
+    --                                                                         _  _(_)
+    --                                                                        | || | |
+    --                                                                         \_,_|_|
+    --                                                                              ui
     {
-      'navarasu/onedark.nvim',
+      "idr4n/github-monochrome.nvim",
       lazy = false,
       priority = 1000,
       opts = {
-        transparent = true,
-        style = 'warmer',
-        colors = {},
-        highlights = {
-          -- ["@keyword"] = {fg = '$green'},
-          -- ["@string"] = {fg = '$bright_orange', bg = '#00ff00', fmt = 'bold'},
-          -- ["@function"] = {fg = '#0000ff', sp = '$cyan', fmt = 'underline,italic'},
-          -- ["@function.builtin"] = {fg = '#0059ff'}
-          ["@markup.heading.1.markdown"] = { fg = '$green' },
-          ["@markup.heading.2.markdown"] = { fg = '$blue' },
-          ["@markup.heading.3.markdown"] = { fg = '$blue' },
-          ["@markup.heading.4.markdown"] = { fg = '$blue' },
-          ["@markup.heading.5.markdown"] = { fg = '$blue' },
-          ["@markup.heading.6.markdown"] = { fg = '$blue' },
-          ["NormalFloat"] = { bg = 'NONE' },
-          ["FloatBorder"] = { bg = 'NONE' },
-          ["FzfLuaBackdrop"] = { bg = 'NONE' },
+        ---@type "light"|"dark"|"solarized"|"tokyonight"|"rosepine"|"rosepine-dawn"
+        style = "dark",
+        alternate_style = "light",
+        -- transparent = true,
+        styles = {
+          floats = "transparent",
+        },
+        on_highlights = function(hl, c)
+          hl.TreesitterContext = { bg = c.none }
+
+          -- if s == "solarized" then
+          --   hl.IblScope = { fg = "#62868C" }
+          -- end
+        end,
+        plugins = {
+          ["blink"] = true,
+          ["which-key"] = true,
+          ["render-markdown"] = true,
+          ["mini_icons"] = true,
+          ["noice"] = true,
         },
       },
       config = function(_, opts)
-        require('onedark').setup(opts)
-        require('onedark').load()
+        require("github-monochrome").setup(opts)
+        vim.cmd.colorscheme("github-monochrome")
       end,
     },
+    { "typicode/bg.nvim",         lazy = false },
+    { 'echasnovski/mini.tabline', config = true },
+    {
+      'folke/noice.nvim',
+      event = 'VeryLazy',
+      dependencies = { 'MunifTanjim/nui.nvim' },
+      opts = {
+        lsp = {
+          override = {
+            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+            ['vim.lsp.util.stylize_markdown'] = true,
+            ['cmp.entry.get_documentation'] = true,
+          },
+        },
+        presets = {
+          bottom_search = true,
+          command_palette = true,
+          long_message_to_split = true,
+          inc_rename = false,
+          lsp_doc_border = true,
+        },
+        cmdline = {
+          -- format = {
+          --   search_down = { view = 'cmdline' },
+          --   search_up = { view = 'cmdline' },
+          -- },
+        },
+        messages = { enabled = false },
+        routes = {
+          {
+            filter = { event = 'lsp' },
+            opts = { skip = true },
+          },
+        },
+        views = {
+          cmdline_popup = {
+            win_options = {
+              winhighlight = { FloatBorder = 'DiagnosticInfo' },
+            },
+          },
+        },
+      },
+    },
+    --                                                                              _
+    --                                                                     _ __  __| |
+    --                                                                    | '  \/ _` |
+    --                                                                    |_|_|_\__,_|
+    --                                                                        markdown
     {
       'MeanderingProgrammer/render-markdown.nvim',
-      dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+      dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
       opts = {
+        bullet = { icons = { '󰁔', '󰘍' } },
+        checkbox = {
+          custom = {
+            important = { raw = '[~]', rendered = '󰓎 ', highlight = 'DiagnosticWarn' },
+          },
+        },
+        callout = {
+          todo = { raw = '[!TODO]', rendered = '󰌶 todo', highlight = 'RenderMarkdownSuccess' },
+        },
         heading = {
           backgrounds = {
             'NONE',
@@ -269,27 +374,25 @@ require('lazy').setup({
         },
       },
     },
-    {
-      'folke/which-key.nvim',
-      event = 'VeryLazy',
-      opts = {
-        preset = 'helix',
-        defaults = {},
-      },
-      dependencies = { 'echasnovski/mini.icons' },
-    },
+    { 'kaymmm/bullets.nvim',       ft = "markdown",    config = true },
+    --                                           _                  _ _   _
+    --                                          | |_ _ _ ___ ___ __(_) |_| |_ ___ _ _
+    --                                          |  _| '_/ -_) -_|_-< |  _|  _/ -_) '_|
+    --                                           \__|_| \___\___/__/_|\__|\__\___|_|
+    --                                                                      treesitter
     {
       'nvim-treesitter/nvim-treesitter',
       event = { 'BufReadPre', 'BufNewFile' },
       dependencies = {
         'nvim-treesitter/nvim-treesitter-textobjects',
-        'tadmccorkle/markdown.nvim',
+        'nvim-treesitter/nvim-treesitter-context',
       },
       build = ':TSUpdate',
       config = function()
         local treesitter = require('nvim-treesitter.configs')
         treesitter.setup({
           markdown = { enable = true },
+          context = { enabled = true },
           indent = { enable = true },
           highlight = { enable = true },
           textobjects = {
@@ -315,6 +418,14 @@ require('lazy').setup({
       end,
     },
     { 'windwp/nvim-ts-autotag' },
+    --                                                                  _ _
+    --                                                       __ ___  __| (_)_ _  __ _
+    --                                                      / _/ _ \/ _` | | ' \/ _` |
+    --                                                      \__\___/\__,_|_|_||_\__, |
+    --                                                                          |___/
+    --                                                                          coding
+    { 'echasnovski/mini.pairs',    config = true },
+    { 'echasnovski/mini.surround', event = 'VeryLazy', config = true, },
     {
       'echasnovski/mini.ai',
       event = 'VeryLazy',
@@ -358,9 +469,79 @@ require('lazy').setup({
         }
       end,
     },
-    { 'neovim/nvim-lspconfig' },
-    { 'hrsh7th/cmp-nvim-lsp' },
-    { 'hrsh7th/nvim-cmp' },
+    --                                                                  __ _ __  _ __
+    --                                                                 / _| '  \| '_ \
+    --                                                                 \__|_|_|_| .__/
+    --                                                                          |_|
+    --                                                                      completion
+    {
+      'saghen/blink.cmp',
+      version = '*',
+      dependencies = { 'L3MON4D3/LuaSnip', version = 'v2.*' },
+      opts = {
+        snippets = { preset = 'luasnip' },
+        keymap = {
+          preset = "enter",
+          ["<C-y>"] = { "select_and_accept" },
+        },
+        appearance = {
+          use_nvim_cmp_as_default = true,
+          nerd_font_variant = 'mono'
+        },
+        completion = {
+          menu = {
+            border = 'single',
+          },
+          documentation = { window = { border = 'single' } },
+        },
+        signature = { window = { border = 'single' } },
+        cmdline = {
+          enabled = false,
+        },
+        sources = {
+          default = { 'lsp', 'path', 'snippets' },
+        },
+      },
+      opts_extend = { "sources.default" }
+    },
+    --                                                                      _
+    --                                                                     | |____ __
+    --                                                                     | (_-< '_ \
+    --                                                                     |_/__/ .__/
+    --                                                                          |_|
+    --                                                                language servers
+    {
+      'neovim/nvim-lspconfig',
+      dependencies = { 'saghen/blink.cmp' },
+      opts = {
+        servers = {
+          lua_ls = {
+            settings = {
+              Lua = {
+                diagnostics = {
+                  globals = { 'vim' }
+                },
+                telemetry = {
+                  enable = false,
+                },
+              },
+            },
+          }
+        }
+      },
+      config = function(_, opts)
+        local lspconfig = require('lspconfig')
+        for server, config in pairs(opts.servers) do
+          config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
+          lspconfig[server].setup(config)
+        end
+      end
+    },
+    --                                                                    __      _
+    --                                                                   / _|_ __| |_
+    --                                                                  |  _| '  \  _|
+    --                                                                  |_| |_|_|_\__|
+    --                                                                      formatting
     {
       'stevearc/conform.nvim',
       event = { 'BufReadPre', 'BufNewFile' },
@@ -395,63 +576,11 @@ require('lazy').setup({
         end, { desc = "Format file or range (in visual mode)" })
       end,
     },
-    {
-      'echasnovski/mini.surround',
-      event = 'VeryLazy',
-      opts = {
-        mappings = {
-          add = 'sa',            -- Add surrounding in Normal and Visual modes
-          delete = 'sd',         -- Delete surrounding
-          find = 'sf',           -- Find surrounding (to the right)
-          find_left = 'sF',      -- Find surrounding (to the left)
-          highlight = 'sh',      -- Highlight surrounding
-          replace = 'sr',        -- Replace surrounding
-          update_n_lines = 'sn', -- Update `n_lines`
-        },
-      },
-      config = true,
-    },
-    {
-      'folke/noice.nvim',
-      event = 'VeryLazy',
-      dependencies = { 'MunifTanjim/nui.nvim' },
-      opts = {
-        lsp = {
-          override = {
-            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
-            ['vim.lsp.util.stylize_markdown'] = true,
-            ['cmp.entry.get_documentation'] = true,
-          },
-        },
-        presets = {
-          bottom_search = true,
-          command_palette = true,
-          long_message_to_split = true,
-          inc_rename = false,
-          lsp_doc_border = true,
-        },
-        cmdline = {
-          format = {
-            search_down = { view = 'cmdline' },
-            search_up = { view = 'cmdline' },
-          },
-        },
-        messages = { enabled = false },
-        routes = {
-          {
-            filter = { event = 'lsp' },
-            opts = { skip = true },
-          },
-        },
-        views = {
-          cmdline_popup = {
-            win_options = {
-              winhighlight = { FloatBorder = 'DiagnosticInfo' },
-            },
-          },
-        },
-      },
-    },
+    --                                                                  _ _  __ ___ __
+    --                                                                 | ' \/ _` \ V /
+    --                                                                 |_||_\__,_|\_/
+    --                                                                      navigation
+    --
     {
       'stevearc/oil.nvim',
       lazy = false,
@@ -472,10 +601,10 @@ require('lazy').setup({
           case_insensitive = false,
         },
         float = {
-          max_width = 0.80,
-          max_height = 0.85,
-          border = "single",              -- Match FzfLua's border
-          get_win_title = function(winid) -- Center title in border
+          max_width = 0.60,
+          max_height = 0.65,
+          border = "single",
+          get_win_title = function()
             return vim.fn.fnamemodify(require('oil').get_current_dir(), ':~')
           end,
           win_options = {
@@ -497,6 +626,7 @@ require('lazy').setup({
         { '<C-k>',  '<cmd>FzfLua builtin<cr>',  desc = 'Fzf Builtin' },
       },
       opts = {
+        hls = { backdrop = "None" },
         fzf_colors = {
           ["gutter"] = "-1"
         },
@@ -511,83 +641,134 @@ require('lazy').setup({
         }
       },
     },
+    --                                                                         _
+    --                                                                     ___| |_ __
+    --                                                                    / -_)  _/ _|
+    --                                                                    \___|\__\__|
+    --                                                                            .etc
     {
-      'tummetott/unimpaired.nvim',
+      'folke/which-key.nvim',
       event = 'VeryLazy',
-      opts = {},
+      opts = {
+        preset = 'helix',
+        defaults = {},
+      },
+      dependencies = { 'echasnovski/mini.icons' },
     },
+    { 'tummetott/unimpaired.nvim', event = 'VeryLazy', config = true },
   },
-  install = { colorscheme = { 'onedark' } },
+  install = { colorscheme = { 'github-monochrome' } },
   checker = { enabled = true },
 })
 
---                                                                    _
---                                                                   | |___ _ __
---                                                                   | / __| '_ \
---                                                                   | \__ \ |_) |
---                                                                   |_|___/ .__/
---                                                                         |_|
---                                                                 language server
+--                                                     _                  _
+--                                           ___ _ __ (_)_ __  _ __   ___| |_ ___
+--                                          / __| '_ \| | '_ \| '_ \ / _ \ __/ __|
+--                                          \__ \ | | | | |_) | |_) |  __/ |_\__ \
+--                                          |___/_| |_|_| .__/| .__/ \___|\__|___/
+--                                                      |_|   |_|
+--                                                                        snippets
 
-local lspconfig_defaults = require('lspconfig').util.default_config
-lspconfig_defaults.capabilities = vim.tbl_deep_extend(
-  'force',
-  lspconfig_defaults.capabilities,
-  require('cmp_nvim_lsp').default_capabilities()
-)
+local ls = require("luasnip")
+ls.config.setup({
+  enable_autosnippets = true,
+  store_selection_keys = "<Tab>",
+  update_events = "TextChanged,TextChangedI",
+  history = true,
+})
 
-autocmd('LspAttach', {
-  desc = 'LSP actions',
-  callback = function(event)
-    local opts = function(desc)
-      return { buffer = event.buf, desc = desc }
+vim.keymap.set({ "i", "s" }, "<Tab>", function()
+  if ls.expand_or_jumpable() then
+    ls.expand_or_jump()
+  else
+    return "<Tab>"
+  end
+end, { expr = true, silent = true })
+
+vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  if ls.jumpable(-1) then
+    ls.jump(-1)
+  else
+    return "<S-Tab>"
+  end
+end, { expr = true, silent = true })
+
+autocmd('FileType', {
+  group = augroup('MarkdownSnippets'),
+  pattern = "markdown",
+  callback = function()
+    local s = ls.snippet
+    local i = ls.insert_node
+    local f = ls.function_node
+    local fmt = require("luasnip.extras.fmt").fmt
+
+    local function clipboard()
+      return vim.fn.getreg("+")
     end
 
-    map('n', '<localleader>f', '<cmd>FzfLua lsp_document_symbols<cr>', opts('find symbol'))
-    map('n', '<localleader>k', '<cmd>lua vim.lsp.buf.hover()<cr>', opts('hover documentation'))
-    map('n', '<localleader>d', '<cmd>lua vim.lsp.buf.definition()<cr>', opts('definition'))
-    map('n', '<localleader>D', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts('declaration'))
-    map('n', '<localleader>i', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts('implementation'))
-    map('n', '<localleader>t', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts('type definition'))
-    map('n', '<localleader>r', '<cmd>lua vim.lsp.buf.references()<cr>', opts('references'))
-    map('n', '<localleader>s', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts('signature help'))
-    map('n', '<localleader>n', '<cmd>lua vim.lsp.buf.rename()<cr>', opts('rename symbol'))
-    map('n', '<localleader>a', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts('code actions'))
+    local markdown_snippets = {
+      -- headers
+      s("sec", fmt("# {}", { i(1, "section") })),
+      s("ssec", fmt("## {}", { i(1, "subsection") })),
+      s("sssec", fmt("### {}", { i(1, "subsubsection") })),
+
+      -- paragraphs
+      s("par", fmt("\n{}\n", { i(1, "paragraph") })),
+      s("spar", fmt("\n{}\n\n", { i(1, "subparagraph") })),
+
+      -- links
+      s("link", fmt("[{}]({})", {
+        i(1, "text"),
+        i(2, "url")
+      })),
+      s("link daily", fmt("[{}]({}.md)", {
+        i(1, "title"),
+        f(function() return os.date("%Y-%m-%d") end),
+      })),
+      s("refl", fmt("[{}][{}]", {
+        i(1, "text"),
+        i(2, "reference")
+      })),
+
+      -- images
+      s("img", fmt("![{}]({})", {
+        i(1, "alt text"),
+        i(2, "image path")
+      })),
+      s("img clipboard", fmt("![{}]({})", {
+        i(1, "alt text"),
+        f(clipboard)
+      })),
+
+      -- code blocks
+      s("cbl", fmt("```{}\n{}\n```", {
+        i(1, "language"),
+        i(2, "code")
+      })),
+      s("ilc", fmt("`{}`", {
+        i(1, "code")
+      })),
+
+      -- text formatting
+      s("*", fmt("*{}*", { i(1, "italic text") })),
+      s("**", fmt("**{}**", { i(1, "bold text") })),
+      s("***", fmt("***{}***", { i(1, "bold italic text") })),
+
+      -- date and time
+      s("date", {
+        f(function() return os.date("%Y-%m-%d") end),
+      }),
+      s("time", {
+        f(function() return os.date("%H:%M:%S") end),
+      }),
+      s("datetime", {
+        f(function() return os.date("%Y-%m-%d %H:%M:%S") end),
+      }),
+      s("diso", {
+        f(function() return os.date("%Y-%m-%dT%H:%M:%S%z") end),
+      }),
+    }
+
+    ls.add_snippets("markdown", markdown_snippets)
   end,
-})
-
-require('lspconfig').marksman.setup({})
-require('lspconfig').lua_ls.setup({
-  settings = {
-    Lua = {
-      diagnostics = {
-        globals = { 'vim' }
-      },
-      telemetry = {
-        enable = false,
-      },
-    },
-  },
-})
-
---                                                            ___ _ __ ___  _ __
---                                                           / __| '_ ` _ \| '_ \
---                                                          | (__| | | | | | |_) |
---                                                           \___|_| |_| |_| .__/
---                                                                         |_|
---                                                                      completion
-
-local cmp = require('cmp')
-
-cmp.setup({
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'render-markdown' },
-  },
-  snippet = {
-    expand = function(args)
-      vim.snippet.expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert({}),
 })
