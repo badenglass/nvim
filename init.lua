@@ -204,18 +204,12 @@ autocmd("FileType", {
 })
 
 -- markdown front matter
-
--- Add this right after the MarkdownSettings autocommand, around line 159
-
--- metadata management for gnosis notes
 autocmd('BufWritePre', {
   group = augroup('GnosisMetadata'),
   pattern = vim.fn.expand('~/Documents/gnosis') .. '/*.md',
   callback = function(evt)
-    -- Get buffer content
     local lines = vim.api.nvim_buf_get_lines(evt.buf, 0, -1, false)
 
-    -- Check if file already has frontmatter
     local has_frontmatter = false
     local content_start = 1
     if #lines > 0 and lines[1] == '---' then
@@ -228,13 +222,12 @@ autocmd('BufWritePre', {
       end
     end
 
-    -- Initialize metadata
+    -- initialize
     local metadata = {
       date = os.date('%Y-%m-%dT%H:%M:%S%z'),
       scratch = 'true'
     }
 
-    -- If frontmatter exists, parse it
     if has_frontmatter then
       for i = 2, content_start - 2 do
         local key, value = lines[i]:match('^([%w_]+):%s*(.+)$')
@@ -251,7 +244,6 @@ autocmd('BufWritePre', {
       end
     end
 
-    -- If scratch is false, prompt for additional metadata
     if metadata.scratch == 'false' then
       if not metadata.title then
         vim.ui.input({
@@ -266,11 +258,10 @@ autocmd('BufWritePre', {
         metadata.tags = { 'none' }
       end
 
-      -- Update modified timestamp
       metadata.modified = os.date('%Y-%m-%dT%H:%M:%S%z')
     end
 
-    -- Format frontmatter
+    -- format frontmatter
     local frontmatter = { '---' }
     for _, key in ipairs({ 'title', 'date', 'modified', 'tags', 'scratch' }) do
       if metadata[key] then
@@ -286,7 +277,6 @@ autocmd('BufWritePre', {
     end
     table.insert(frontmatter, '---')
 
-    -- Combine frontmatter with content
     local new_lines = vim.list_extend(frontmatter, vim.list_slice(lines, content_start))
     vim.api.nvim_buf_set_lines(evt.buf, 0, -1, false, new_lines)
   end,
