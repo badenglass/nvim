@@ -175,10 +175,10 @@ autocmd("FileType", {
     vim.opt_local.relativenumber = false
 
     vim.opt_local.wrap = true
-    vim.opt_local.linebreak = true
+    -- vim.opt_local.linebreak = true
 
-    vim.opt_local.tabstop = 4
-    vim.opt_local.shiftwidth = 4
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
 
     vim.opt_local.signcolumn = "yes:2"
     vim.opt_local.foldcolumn = "1"
@@ -203,6 +203,95 @@ autocmd("FileType", {
   end,
 })
 
+-- markdown front matter
+
+-- Add this right after the MarkdownSettings autocommand, around line 159
+
+-- metadata management for gnosis notes
+autocmd('BufWritePre', {
+  group = augroup('GnosisMetadata'),
+  pattern = vim.fn.expand('~/Documents/gnosis') .. '/*.md',
+  callback = function(evt)
+    -- Get buffer content
+    local lines = vim.api.nvim_buf_get_lines(evt.buf, 0, -1, false)
+
+    -- Check if file already has frontmatter
+    local has_frontmatter = false
+    local content_start = 1
+    if #lines > 0 and lines[1] == '---' then
+      for i = 2, #lines do
+        if lines[i] == '---' then
+          has_frontmatter = true
+          content_start = i + 1
+          break
+        end
+      end
+    end
+
+    -- Initialize metadata
+    local metadata = {
+      date = os.date('%Y-%m-%dT%H:%M:%S%z'),
+      scratch = 'true'
+    }
+
+    -- If frontmatter exists, parse it
+    if has_frontmatter then
+      for i = 2, content_start - 2 do
+        local key, value = lines[i]:match('^([%w_]+):%s*(.+)$')
+        if key then
+          if key == 'tags' then
+            metadata.tags = {}
+            for tag in value:gmatch('%w+') do
+              table.insert(metadata.tags, tag)
+            end
+          else
+            metadata[key] = value
+          end
+        end
+      end
+    end
+
+    -- If scratch is false, prompt for additional metadata
+    if metadata.scratch == 'false' then
+      if not metadata.title then
+        vim.ui.input({
+          prompt = 'Title: ',
+          default = vim.fn.fnamemodify(evt.file, ':t:r'),
+        }, function(input)
+          if input then metadata.title = input end
+        end)
+      end
+
+      if not metadata.tags then
+        metadata.tags = { 'none' }
+      end
+
+      -- Update modified timestamp
+      metadata.modified = os.date('%Y-%m-%dT%H:%M:%S%z')
+    end
+
+    -- Format frontmatter
+    local frontmatter = { '---' }
+    for _, key in ipairs({ 'title', 'date', 'modified', 'tags', 'scratch' }) do
+      if metadata[key] then
+        if key == 'tags' then
+          table.insert(frontmatter, 'tags:')
+          for _, tag in ipairs(metadata.tags) do
+            table.insert(frontmatter, string.format('  - %s', tag))
+          end
+        else
+          table.insert(frontmatter, string.format('%s: %s', key, metadata[key]))
+        end
+      end
+    end
+    table.insert(frontmatter, '---')
+
+    -- Combine frontmatter with content
+    local new_lines = vim.list_extend(frontmatter, vim.list_slice(lines, content_start))
+    vim.api.nvim_buf_set_lines(evt.buf, 0, -1, false, new_lines)
+  end,
+})
+
 
 --                                                                          _
 --         _   _ ___  ___ _ __ ___ ___  _ __ ___  _ __ ___   __ _ _ __   __| |___
@@ -211,6 +300,69 @@ autocmd("FileType", {
 --         \__,_|___/\___|_|  \___\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
 --                                                                    usercommands
 --        TODO: daily note & hugo integration
+
+local usercmd = vim.api.nvim_create_user_command
+
+local gnosis_dir = vim.fn.expand('~/Documents/gnosis')
+if vim.fn.isdirectory(gnosis_dir) == 0 then
+  vim.fn.mkdir(gnosis_dir, 'p')
+end
+
+local function create_note(title)
+  if not title or title == '' then
+    return
+  end
+
+  local filename = string.format('%s/%s.md', gnosis_dir, title)
+  vim.cmd('edit ' .. filename)
+
+  if vim.fn.filereadable(filename) == 0 then
+    vim.api.nvim_buf_set_lines(0, 0, 0, false, { '# ' .. title, '' })
+  end
+end
+
+usercmd('Gnosis', function(opts)
+  if opts.args == '' then
+    vim.ui.input({
+      prompt = 'title: ',
+    }, function(input)
+      create_note(input)
+    end)
+  else
+    create_note(opts.args)
+  end
+end, {
+  nargs = '?',
+  desc = 'new gnosis note',
+})
+
+usercmd('G', function(opts)
+  vim.cmd('Gnosis ' .. (opts.args or ''))
+end, {
+  nargs = '?',
+  desc = 'Alias for Gnosis command',
+})
+
+usercmd('GnosisDaily', function()
+  local date = os.date('%d-%m-%y')
+  local day = os.date('%a')
+  local title = string.format('%s %s %s', day, os.date('%d'), os.date('%b'))
+
+  local filename = string.format('%s/%s.md', gnosis_dir, date)
+  vim.cmd('edit ' .. filename)
+
+  if vim.fn.filereadable(filename) == 0 then
+    vim.api.nvim_buf_set_lines(0, 0, 0, false, { '# ' .. title, '' })
+  end
+end, {
+  desc = 'Create a new daily Gnosis note',
+})
+
+usercmd('GD', function()
+  vim.cmd('GnosisDaily')
+end, {
+  desc = 'Alias for GnosisDaily command',
+})
 
 --                                       _
 --                                      | | _____ _   _ _ __ ___   __ _ _ __  ___
@@ -280,12 +432,9 @@ require('lazy').setup({
       priority = 1000,
       opts = {
         ---@type "light"|"dark"|"solarized"|"tokyonight"|"rosepine"|"rosepine-dawn"
-        style = "dark",
+        style = "tokyonight",
         alternate_style = "light",
-        -- transparent = true,
-        styles = {
-          floats = "transparent",
-        },
+        styles = { floats = "transparent" },
         on_highlights = function(hl, c)
           hl.TreesitterContext = { bg = c.none }
 
@@ -303,11 +452,12 @@ require('lazy').setup({
       },
       config = function(_, opts)
         require("github-monochrome").setup(opts)
-        vim.cmd.colorscheme("github-monochrome")
+        vim.cmd.colorscheme("github-monochrome-light")
       end,
     },
-    { "typicode/bg.nvim",         lazy = false },
-    { 'echasnovski/mini.tabline', config = true },
+    { "typicode/bg.nvim",               lazy = false },
+    { "eandrju/cellular-automaton.nvim" },
+    { 'echasnovski/mini.tabline',       config = true },
     {
       'folke/noice.nvim',
       event = 'VeryLazy',
@@ -328,10 +478,10 @@ require('lazy').setup({
           lsp_doc_border = true,
         },
         cmdline = {
-          -- format = {
-          --   search_down = { view = 'cmdline' },
-          --   search_up = { view = 'cmdline' },
-          -- },
+          format = {
+            search_down = { view = 'cmdline' },
+            search_up = { view = 'cmdline' },
+          },
         },
         messages = { enabled = false },
         routes = {
@@ -368,13 +518,12 @@ require('lazy').setup({
           todo = { raw = '[!TODO]', rendered = '󰌶 todo', highlight = 'RenderMarkdownSuccess' },
         },
         heading = {
-          backgrounds = {
-            'NONE',
-          },
+          backgrounds = { 'NONE' },
         },
+        dash = { width = 15 },
       },
     },
-    { 'kaymmm/bullets.nvim',       ft = "markdown",    config = true },
+    -- { 'kaymmm/bullets.nvim',       ft = "markdown",    config = function() require('Bullets').setup() end, },
     --                                           _                  _ _   _
     --                                          | |_ _ _ ___ ___ __(_) |_| |_ ___ _ _
     --                                          |  _| '_/ -_) -_|_-< |  _|  _/ -_) '_|
@@ -499,7 +648,14 @@ require('lazy').setup({
           enabled = false,
         },
         sources = {
-          default = { 'lsp', 'path', 'snippets' },
+          default = { 'lsp', 'path', 'snippets', 'markdown' },
+          providers = {
+            markdown = {
+              name = 'RenderMarkdown',
+              module = 'render-markdown.integ.blink',
+              fallbacks = { 'lsp' },
+            },
+          },
         },
       },
       opts_extend = { "sources.default" }
@@ -515,6 +671,7 @@ require('lazy').setup({
       dependencies = { 'saghen/blink.cmp' },
       opts = {
         servers = {
+          marksman = {},
           lua_ls = {
             settings = {
               Lua = {
@@ -535,6 +692,27 @@ require('lazy').setup({
           config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
           lspconfig[server].setup(config)
         end
+
+        autocmd('LspAttach', {
+          desc = 'LSP actions',
+          callback = function(event)
+            local desc = function(desc)
+              return { buffer = event.buf, desc = desc }
+            end
+
+            map('n', '<localleader>f', '<cmd>FzfLua lsp_document_symbols<cr>', desc('find symbol'))
+            map('n', '<localleader>k', '<cmd>lua vim.lsp.buf.hover()<cr>', desc('hover documentation'))
+            map('n', '<localleader>d', '<cmd>lua vim.lsp.buf.definition()<cr>', desc('definition'))
+            map('n', '<localleader>D', '<cmd>lua vim.lsp.buf.declaration()<cr>', desc('declaration'))
+            map('n', '<localleader>i', '<cmd>lua vim.lsp.buf.implementation()<cr>', desc('implementation'))
+            map('n', '<localleader>t', '<cmd>lua vim.lsp.buf.type_definition()<cr>', desc('type definition'))
+            map('n', '<localleader>r', '<cmd>lua vim.lsp.buf.references()<cr>', desc('references'))
+            map('n', '<localleader>s', '<cmd>lua vim.lsp.buf.signature_help()<cr>', desc('signature help'))
+            map('n', '<localleader>n', '<cmd>lua vim.lsp.buf.rename()<cr>', desc('rename symbol'))
+            map({ 'n', 'x' }, '<localleader><cr>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', desc('format'))
+            map('n', '<localleader>a', '<cmd>lua vim.lsp.buf.code_action()<cr>', desc('code actions'))
+          end,
+        })
       end
     },
     --                                                                    __      _

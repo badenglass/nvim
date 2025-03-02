@@ -1,6 +1,8 @@
 # Baden's Neovim Configuration
 
-| **plugin**                                                                                                    |                 _description_                  |
+## Plugin List
+
+| **github**                                                                                                    |                 _description_                  |
 | :------------------------------------------------------------------------------------------------------------ | :--------------------------------------------: |
 | [folke/lazy.nvim](https://github.com/folke/lazy.nvim)                                                         |                 plugin manager                 |
 | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             |                   formatting                   |
@@ -24,3 +26,17 @@
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) |          treesitter aware textobjects          |
 | [windwp/nvim-ts-autotag](https://github.com/windwp/nvim-ts-autotag)                                           |        auto close some treesitter tags         |
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               |                  keybind help                  |
+
+## Resources
+
+- [neovim as a markdown editor](https://mambusskruj.github.io/posts/pub-neovim-for-markdown/)
+- semantic line breaking
+  - [blog](https://ramshankar.org/blog/posts/2019/semantic-line-breaks/)
+  - [specification](https://sembr.org/)
+- [unix as an IDE](https://blog.sanctum.geek.nz/series/unix-as-ide/)
+
+## Plugin Docs
+
+- [lazy vim](https://www.lazyvim.org/)
+- [blink](https://cmp.saghen.dev/)
+- [lsp-zero](https://lsp-zero.netlify.app/)
