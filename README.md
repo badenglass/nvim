@@ -2,6 +2,9 @@
 
 ## Plugin List
 
+[!WARNING]
+The following is not up to date.
+
 | **github**                                                                                                    |                 _description_                  |
 | :------------------------------------------------------------------------------------------------------------ | :--------------------------------------------: |
 | [folke/lazy.nvim](https://github.com/folke/lazy.nvim)                                                         |                 plugin manager                 |
